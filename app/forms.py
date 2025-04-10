@@ -12,4 +12,3 @@ class MovieForms(FlaskForm):
     poster = FileField('Movie Poster', validators= [FileRequired(),FileAllowed(['jpg','png','jpeg'], 'Images Only!!') ])
 
     submit = SubmitField('Add Movie')
-    #Comment
