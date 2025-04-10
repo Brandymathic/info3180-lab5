@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, FileField, SubmitField
 from wtforms.validators import DataRequired, Length, FileRequired, FileAllowed
 
-class MovieForms(FlaskForm):
+class MovieForm(FlaskForm):
 
     title = StringField('Movie Title', validators = [DataRequired(), Length(max=100)])
 
