@@ -19,3 +19,5 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+from app import views
