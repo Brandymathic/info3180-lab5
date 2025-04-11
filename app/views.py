@@ -7,7 +7,9 @@ This file creates your application.
 
 from app import app, db
 from flask import render_template, request, jsonify, send_file
-from .forms import MovieForms
+from .forms import MovieForm
+from .models import Movie
+from datetime import datetime
 import os
 
 
@@ -45,6 +47,43 @@ def send_text_file(file_name):
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
 
+#New Route for adding movies
+@app.route('/api/v1/movies', methods=['POST'])
+def movies():
+    form = MovieForm()
+
+    if form.validate_on_submit():
+        #Save the uploaded file
+        poster_file = form.poster.data
+        poster_filename = poster_file.filename
+        poster_path = os.path.join(app.config['UPLOAD_FOLDER'], poster_filename)
+        poster_file.save(poster_path)
+
+
+        #Create a new Movie Instance
+        new_movie = Movie(
+            title = form.title.data,
+            description = form.description.data,
+            poster=poster_filename,
+            created_at=datetime.now()
+        )
+
+        #Add the movie to the database
+        db.session.add(new_movie)
+        db.session.commit()
+
+
+        #Return a success message
+        return jsonify({
+            "message": "Movie Successfully added",
+            "title": new_movie.title,
+            "poster": new_movie.poster,
+            "description": new_movie.description
+        }), 201
+    else:
+        #Collect Form Errors
+        errors = form_errors(form)
+        return jsonify({"errors": errors}), 400
 
 @app.after_request
 def add_header(response):
