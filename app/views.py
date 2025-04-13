@@ -11,6 +11,7 @@ from .forms import MovieForm
 from .models import Movie
 from datetime import datetime
 import os
+from flask_wtf.csrf import generate_csrf  # Add this import at the top
 
 
 ###
@@ -20,6 +21,12 @@ import os
 @app.route('/')
 def index():
     return jsonify(message="This is the beginning of our API")
+
+
+# Add the CSRF token route here
+@app.route('/api/v1/csrf-token', methods=['GET'])
+def get_csrf():
+    return jsonify({'csrf_token': generate_csrf()})
 
 
 ###
