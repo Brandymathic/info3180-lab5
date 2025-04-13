@@ -54,43 +54,61 @@ def send_text_file(file_name):
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
 
-#New Route for adding movies
-@app.route('/api/v1/movies', methods=['POST'])
+# Route for handling movies - supports both GET and POST
+@app.route('/api/v1/movies', methods=['GET', 'POST'])
 def movies():
-    form = MovieForm()
+    if request.method == 'GET':
+        movies = Movie.query.all()
+        movies_list = []
+        
+        for movie in movies:
+            movies_list.append({
+                'id': movie.id,
+                'title': movie.title,
+                'description': movie.description,
+                'poster': f'/api/v1/posters/{movie.poster}'
+            })
+        
+        return jsonify({'movies': movies_list})
+    
+    elif request.method == 'POST':
+        form = MovieForm()
 
-    if form.validate_on_submit():
-        #Save the uploaded file
-        poster_file = form.poster.data
-        poster_filename = poster_file.filename
-        poster_path = os.path.join(app.config['UPLOAD_FOLDER'], poster_filename)
-        poster_file.save(poster_path)
+        if form.validate_on_submit():
+            #Save the uploaded file
+            poster_file = form.poster.data
+            poster_filename = poster_file.filename
+            poster_path = os.path.join(app.config['UPLOAD_FOLDER'], poster_filename)
+            poster_file.save(poster_path)
 
+            #Create a new Movie Instance
+            new_movie = Movie(
+                title = form.title.data,
+                description = form.description.data,
+                poster=poster_filename,
+                created_at=datetime.now()
+            )
 
-        #Create a new Movie Instance
-        new_movie = Movie(
-            title = form.title.data,
-            description = form.description.data,
-            poster=poster_filename,
-            created_at=datetime.now()
-        )
+            #Add the movie to the database
+            db.session.add(new_movie)
+            db.session.commit()
 
-        #Add the movie to the database
-        db.session.add(new_movie)
-        db.session.commit()
+            #Return a success message
+            return jsonify({
+                "message": "Movie Successfully added",
+                "title": new_movie.title,
+                "poster": new_movie.poster,
+                "description": new_movie.description
+            }), 201
+        else:
+            #Collect Form Errors
+            errors = form_errors(form)
+            return jsonify({"errors": errors}), 400
 
-
-        #Return a success message
-        return jsonify({
-            "message": "Movie Successfully added",
-            "title": new_movie.title,
-            "poster": new_movie.poster,
-            "description": new_movie.description
-        }), 201
-    else:
-        #Collect Form Errors
-        errors = form_errors(form)
-        return jsonify({"errors": errors}), 400
+# Route to serve poster images
+@app.route('/api/v1/posters/<filename>', methods=['GET'])
+def get_image(filename):
+    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 @app.after_request
 def add_header(response):

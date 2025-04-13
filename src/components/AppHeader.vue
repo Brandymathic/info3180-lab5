@@ -22,9 +22,12 @@
             <li class="nav-item">
               <RouterLink class="nav-link" to="/about">About</RouterLink>
             </li>
-            <!-- Add this new navigation item -->
             <li class="nav-item">
               <RouterLink class="nav-link" to="/movies/create">Add Movie</RouterLink>
+            </li>
+            <!-- New navigation item for Movies page -->
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/movies">Movies</RouterLink>
             </li>
           </ul>
         </div>
@@ -38,5 +41,33 @@ import { RouterLink } from "vue-router";
 </script>
 
 <style>
-/* Add any component specific styles here */
+/* Header styles */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.nav-item {
+  margin: 0 2px;
+  transition: all 0.3s ease;
+}
+
+.nav-link {
+  font-weight: 500;
+  padding: 8px 15px !important;
+  border-radius: 4px;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
 </style>
